@@ -20,3 +20,6 @@ Mt4/tester/
 *.ex5
 *.ex4
 *.exe
+!metaeditor.exe
+!metaeditor64.exe
+
