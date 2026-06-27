@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     branches:
-      - main   # или по триггеру, который вам нужен
+      - master
 
 permissions:
   contents: write
