@@ -37,13 +37,26 @@ jobs:
       - name: Archive Mt5
         run: zip -r mt5.zip Mt5/
 
-      # 6. Создаём релиз и прикрепляем оба архива
+      # 6. Вычисляем следующий номер релиза
+      - name: Get next release number
+        id: next_release
+        run: |
+          # Ищем все теги вида release-* и извлекаем числа
+          latest=$(git tag -l 'release-*' | sed 's/release-//' | sort -n | tail -1)
+          if [ -z "$latest" ]; then
+            next=1
+          else
+            next=$((latest + 1))
+          fi
+          echo "tag=release-$next" >> $GITHUB_OUTPUT
+          echo "name=Release $next" >> $GITHUB_OUTPUT
+
+      # 7. Создаём релиз и прикрепляем оба архива
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: Release ${{ github.sha }}          # имя релиза — хэш коммита
-          tag_name: ${{ github.sha }}             # тег тоже равен хэшу
+          tag_name: ${{ steps.next_release.outputs.tag }}
+          name: ${{ steps.next_release.outputs.name }}
           draft: false
           prerelease: false
           files: |
