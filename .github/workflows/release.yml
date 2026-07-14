@@ -12,36 +12,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1. Клонируем репозиторий с поддержкой LFS
       - name: Checkout code with LFS
         uses: actions/checkout@v4
         with:
-          lfs: true          # автоматически загружает LFS-объекты
+          lfs: true
 
-      # 2. Убеждаемся, что git-lfs установлен (обычно уже есть, но для надёжности)
       - name: Install git-lfs
         run: |
           sudo apt-get update
           sudo apt-get install git-lfs
           git lfs install
 
-      # 3. Дополнительно подтягиваем LFS-файлы (на случай, если checkout не всё забрал)
       - name: Pull LFS files
         run: git lfs pull
 
-      # 4. Архивируем папку Mt4 со всем содержимым (подпапки + exe)
       - name: Archive Mt4
         run: zip -r mt4.zip Mt4/
 
-      # 5. Архивируем папку Mt5
       - name: Archive Mt5
         run: zip -r mt5.zip Mt5/
 
-      # 6. Вычисляем следующий номер релиза
       - name: Get next release number
         id: next_release
         run: |
-          # Ищем все теги вида release-* и извлекаем числа
           latest=$(git tag -l 'release-*' | sed 's/release-//' | sort -n | tail -1)
           if [ -z "$latest" ]; then
             next=1
@@ -51,7 +44,6 @@ jobs:
           echo "tag=release-$next" >> $GITHUB_OUTPUT
           echo "name=Release $next" >> $GITHUB_OUTPUT
 
-      # 7. Создаём релиз и прикрепляем оба архива
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
